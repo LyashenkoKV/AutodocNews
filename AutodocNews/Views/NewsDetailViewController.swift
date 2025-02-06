@@ -9,10 +9,9 @@ import UIKit
 
 @MainActor
 final class NewsDetailViewController: UIViewController {
-    // MARK: - Свойства
     private let news: News
+    private let formatter = DateFormatter()
 
-    // Элементы интерфейса
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     private let stackView = UIStackView()
@@ -21,18 +20,17 @@ final class NewsDetailViewController: UIViewController {
     private let dateLabel = UILabel()
     private let descriptionLabel = UILabel()
 
-    // MARK: - Инициализация
     init(news: News) {
         self.news = news
         super.init(nibName: nil, bundle: nil)
         self.title = NSLocalizedString("News Detail", comment: "Title for news detail screen")
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Жизненный цикл
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -40,9 +38,8 @@ final class NewsDetailViewController: UIViewController {
         configureContent()
     }
 
-    // MARK: - Настройка интерфейса
+
     private func setupUI() {
-        // Настройка scrollView
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
         NSLayoutConstraint.activate([
@@ -52,7 +49,7 @@ final class NewsDetailViewController: UIViewController {
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
 
-        // Контейнер для контента
+
         contentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(contentView)
         NSLayoutConstraint.activate([
@@ -63,7 +60,7 @@ final class NewsDetailViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
 
-        // Настройка stackView
+
         stackView.axis = .vertical
         stackView.spacing = 16
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -75,41 +72,31 @@ final class NewsDetailViewController: UIViewController {
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
         ])
 
-        // Настройка imageView
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
 
-        // Настройка заголовка
         titleLabel.font = UIFont.preferredFont(forTextStyle: .headline)
         titleLabel.numberOfLines = 0
 
-        // Настройка метки даты
         dateLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
         dateLabel.textColor = .secondaryLabel
 
-        // Настройка описания новости
         descriptionLabel.font = UIFont.preferredFont(forTextStyle: .body)
         descriptionLabel.numberOfLines = 0
 
-        // Если для новости задан URL изображения, добавляем imageView в stackView
         if let imageUrlString = news.titleImageUrl, let url = URL(string: imageUrlString) {
             stackView.addArrangedSubview(imageView)
             loadImage(from: url)
         }
 
-        // Добавляем остальные элементы в stackView
         stackView.addArrangedSubview(titleLabel)
         stackView.addArrangedSubview(dateLabel)
         stackView.addArrangedSubview(descriptionLabel)
     }
 
-    // MARK: - Конфигурация контента
     private func configureContent() {
         titleLabel.text = news.title
-
-        // Форматирование даты публикации
-        let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
         dateLabel.text = formatter.string(from: news.publishedDate)
@@ -126,7 +113,6 @@ final class NewsDetailViewController: UIViewController {
                     self.imageView.image = image
                 }
             } catch {
-                // Можно добавить логирование ошибки или установить placeholder
                 print("Ошибка загрузки изображения: \(error)")
             }
         }

@@ -32,16 +32,6 @@ final class NewsListViewController: UIViewController {
         viewModel.loadNews()
     }
 
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        navigationController?.setNavigationBarHidden(true, animated: animated)
-//    }
-//
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//        navigationController?.setNavigationBarHidden(false, animated: animated)
-//    }
-
     private func setupUI() {
         view.backgroundColor = .systemBackground
         title = NSLocalizedString("News", comment: "Autodoc News")
@@ -89,6 +79,9 @@ extension NewsListViewController: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
+        guard indexPath.row < viewModel.newsItems.count else {
+            return
+        }
         let news = viewModel.newsItems[indexPath.row]
         router?.showNewsDetail(with: news)
     }
@@ -119,6 +112,11 @@ extension NewsListViewController: UICollectionViewDataSource {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         let cell: NewsCell = collectionView.dequeueReusableCell(indexPath: indexPath)
+
+        guard indexPath.row < viewModel.newsItems.count else {
+            return cell
+        }
+
         let news = viewModel.newsItems[indexPath.row]
         cell.configure(with: news)
         return cell

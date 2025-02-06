@@ -14,7 +14,6 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .black
         view.layer.cornerRadius = 16
         view.clipsToBounds = true
@@ -23,7 +22,6 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     private lazy var newsImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.backgroundColor = .black
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -32,7 +30,6 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         label.textColor = .white
@@ -41,7 +38,6 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     private var gradientView: UIView = {
         let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.isUserInteractionEnabled = false
         return view
     }()
@@ -52,7 +48,7 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .black
+        contentView.backgroundColor = .systemBackground
         setupViews()
     }
 
@@ -65,6 +61,13 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+
+        gradientView.frame = CGRect(
+            x: 0.0,
+            y: containerView.bounds.height - 50.0,
+            width: containerView.bounds.width,
+            height: 60.0
+        )
         gradientLayer?.frame = gradientView.bounds
     }
 
@@ -77,9 +80,10 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     private func setupViews() {
         contentView.setupView(containerView)
-        containerView.setupView(newsImageView)
-        containerView.setupView(gradientView)
-        containerView.setupView(titleLabel)
+
+        [newsImageView, gradientView, titleLabel].forEach {
+            containerView.setupView($0)
+        }
 
         newsImageView.constraintEdges(to: containerView)
 
@@ -89,11 +93,6 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
             containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
 
-            gradientView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            gradientView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            gradientView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-            gradientView.heightAnchor.constraint(equalToConstant: 60),
-
             titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 8),
             titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -8),
             titleLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -8)
@@ -102,12 +101,23 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
     }
 
     private func addGradientView() {
+        gradientView.frame = CGRect(
+            x: 0.0,
+            y: containerView.bounds.height - 50.0,
+            width: containerView.bounds.width,
+            height: 60.0
+        )
         let gradient = CAGradientLayer()
-        gradient.colors = [UIColor.clear.cgColor, UIColor.black.withAlphaComponent(0.4).cgColor]
-        gradient.locations = [0.0, 1.0]
         gradient.frame = gradientView.bounds
+        gradient.colors = [UIColor.clear.cgColor,
+                           UIColor.black.withAlphaComponent(0.7).cgColor]
+        gradient.locations = [0.0, 1.0]
         gradientView.layer.insertSublayer(gradient, at: 0)
         self.gradientLayer = gradient
+
+        if gradientView.superview == nil {
+            containerView.setupView(gradientView)
+        }
     }
 }
 
@@ -119,21 +129,17 @@ extension NewsCell {
         titleLabel.text = news.title
 
         if let imageUrlString = news.titleImageUrl, let url = URL(string: imageUrlString) {
+            let targetSize = CGSize(width: bounds.width - 32, height: bounds.height - 16)
+
             Task {
-                do {
-                    let (data, _) = try await URLSession.shared.data(from: url)
-                    let image = UIImage(data: data)
+                if let image = await ImageDownsampleService.shared.loadImage(from: url, targetSize: targetSize) {
                     newsImageView.image = image
-                } catch {
-                    Logger.shared.log(
-                        .error,
-                        message: "Failed to load image:",
-                        metadata: ["❌": error.localizedDescription]
-                    )
+                } else {
+                    newsImageView.image = UIImage(systemName: "photo")
                 }
             }
         } else {
-            newsImageView.image = nil
+            newsImageView.image = UIImage(systemName: "photo")
         }
     }
 }
