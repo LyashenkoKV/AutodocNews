@@ -12,14 +12,14 @@ protocol Router {
     func showNewsDetail(with news: News)
 }
 
-final class AppRouter: Router {
+final class AppRouter: @preconcurrency Router {
     weak var navigationController: UINavigationController?
 
     init(navigationController: UINavigationController?) {
         self.navigationController = navigationController
     }
 
-    func showNewsDetail(with news: News) {
+    @MainActor func showNewsDetail(with news: News) {
         let detailVC = NewsDetailViewController(news: news)
         navigationController?.pushViewController(detailVC, animated: true)
     }
