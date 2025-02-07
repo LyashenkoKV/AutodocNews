@@ -8,14 +8,20 @@
 import Foundation
 
 final class NetworkManager {
-    static let shared = NetworkManager()
+    static let shared = NetworkManager(networkService: NetworkService())
+
+    private let networkService: NetworkServiceProtocol
+
+    init(networkService: NetworkServiceProtocol) {
+        self.networkService = networkService
+    }
 
     func fetchNews(page: Int) async throws -> NewsResponse {
         guard let url = URL(string: "https://webapi.autodoc.ru/api/news/\(page)/15") else {
             throw URLError(.badURL)
         }
 
-        let (data, _) = try await URLSession.shared.data(from: url)
+        let (data, _) = try await networkService.fetchData(from: url)
         let decoder = JSONDecoder()
 
         DateFormatter.dateFormatter(decoder)
