@@ -139,14 +139,13 @@ extension NewsCell {
             let targetSize = CGSize(width: bounds.width - 32, height: bounds.height - 16)
 
             Task {
-                if let image = await ImageDownsampleService.shared.loadImage(from: url, targetSize: targetSize) {
-                    newsImageView.image = image
-                } else {
-                    newsImageView.image = UIImage(systemName: "photo")
+                let image = await ImageDownsampleService.shared.loadImage(from: url, targetSize: targetSize)
+                UIView.transition(with: newsImageView,
+                                  duration: 0.25,
+                                  options: .transitionCrossDissolve) {
+                    self.newsImageView.image = image
                 }
             }
-        } else {
-            newsImageView.image = UIImage(systemName: "photo")
         }
     }
 }

@@ -25,21 +25,23 @@ final class NewsViewModel {
         Task {
             do {
                 let newsResponse = try await NetworkManager.shared.fetchNews(page: currentPage)
+                let newItems = newsResponse.news
+
                 await MainActor.run {
-                    newsItems.append(contentsOf: newsResponse.news)
-                    totalCount = newsResponse.totalCount
-                    currentPage += 1
-                    isFetching = false
-                    isLoading = false
+                    let updatedItems = self.newsItems + newItems
+                    self.newsItems = updatedItems
+                    self.totalCount = newsResponse.totalCount
+                    self.currentPage += 1
                 }
             } catch {
                 Logger.shared.log(.error,
                                   message: "Error loading news:",
                                   metadata: ["❌": error.localizedDescription])
             }
-            await MainActor.run { isFetching = false }
-            isFetching = false
-            isLoading = false 
+            await MainActor.run {
+                isFetching = false
+                isLoading = false
+            }
         }
     }
 }

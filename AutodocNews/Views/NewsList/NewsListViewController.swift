@@ -61,7 +61,9 @@ final class NewsListViewController: UIViewController {
         view.setupView(loading)
         collectionView.setupView(refreshControl)
         loading.constraintCenters(to: view)
-        refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
+        refreshControl.addTarget(self,
+                                 action: #selector(self.refresh(_:)),
+                                 for: .valueChanged)
     }
 
     @objc func refresh(_ sender: AnyObject) {
@@ -95,9 +97,20 @@ extension NewsListViewController {
     private func bindViewModel() {
         viewModel.$newsItems
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.collectionView.reloadData()
-                self?.stopLoading()
+            .sink { [weak self] newItems in
+                guard let self else { return }
+
+                let oldCount = self.collectionView.numberOfItems(inSection: 0)
+                let newCount = newItems.count
+
+                self.collectionView.performBatchUpdates {
+                    let indexPaths = (oldCount..<newCount).map {
+                        IndexPath(item: $0, section: 0)
+                    }
+                    self.collectionView.insertItems(at: indexPaths)
+                } completion: { _ in
+                    self.stopLoading()
+                }
             }
             .store(in: &cancellables)
 
