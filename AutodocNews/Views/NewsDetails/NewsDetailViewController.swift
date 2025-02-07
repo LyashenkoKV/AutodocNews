@@ -15,27 +15,13 @@ final class NewsDetailViewController: UIViewController {
 
     private let viewModel: NewsDetailsViewModel
     private var cancellables = Set<AnyCancellable>()
-
-    private lazy var tableView: UITableView = {
-        let tv = UITableView(frame: .zero, style: .insetGrouped)
-        tv.delegate = self
-        tv.dataSource = self
-        tv.separatorStyle = .none
-        tv.estimatedRowHeight = 44
-        tv.rowHeight = UITableView.automaticDimension
-        tv.register(NewsHStackCell.self)
-        tv.register(NewsDateCell.self)
-        tv.register(NewsTextCell.self)
-        tv.register(NewsImagesCell.self)
-        return tv
-    }()
+    private lazy var tableView = UITableView(frame: .zero, style: .insetGrouped)
 
     // MARK: - Init
 
     init(news: News) {
         self.viewModel = NewsDetailsViewModel(news: news)
         super.init(nibName: nil, bundle: nil)
-        self.title = NSLocalizedString("News Detail", comment: "Detail")
     }
 
     @available(*, unavailable)

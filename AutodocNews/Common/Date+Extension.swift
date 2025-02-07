@@ -11,6 +11,7 @@ extension Date {
     func formattedRelativeDate() -> String {
         let formatter = DateFormatter()
         let calendar = Calendar.current
+        let russianLocale = Locale(identifier: "ru_RU")
 
         if calendar.isDateInToday(self) {
             return "Сегодня"
@@ -18,7 +19,7 @@ extension Date {
             return "Вчера"
         } else {
             formatter.dateFormat = "d MMMM"
-            formatter.locale = Locale.current
+            formatter.locale = russianLocale
             return formatter.string(from: self)
         }
     }

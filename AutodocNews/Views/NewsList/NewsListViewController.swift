@@ -43,7 +43,6 @@ final class NewsListViewController: UIViewController {
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
-        title = NSLocalizedString("News", comment: "Autodoc News")
         view.setupView(collectionView)
     }
 
@@ -53,7 +52,9 @@ final class NewsListViewController: UIViewController {
 
     func stopLoading() {
         loading.stopAnimating()
-        refreshControl.endRefreshing()
+        if refreshControl.isRefreshing {
+            refreshControl.endRefreshing()
+        }
     }
 
     func setupViews() {
@@ -97,6 +98,23 @@ extension NewsListViewController {
             .sink { [weak self] _ in
                 self?.collectionView.reloadData()
                 self?.stopLoading()
+            }
+            .store(in: &cancellables)
+
+        viewModel.$isLoading
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                guard let self = self else { return }
+
+                if self.refreshControl.isRefreshing {
+                    return
+                }
+
+                if isLoading {
+                    self.startLoading()
+                } else {
+                    self.stopLoading()
+                }
             }
             .store(in: &cancellables)
     }

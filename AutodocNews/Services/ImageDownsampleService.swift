@@ -10,9 +10,14 @@ import ImageIO
 
 final class ImageDownsampleService {
 
-    static let shared = ImageDownsampleService()
+    static let shared = ImageDownsampleService(networkService: NetworkService())
 
     private let cache = NSCache<NSString, UIImage>()
+    private let networkService: NetworkServiceProtocol
+
+    init(networkService: NetworkServiceProtocol) {
+        self.networkService = networkService
+    }
 
     private func downsample(imageData: Data, to pointSize: CGSize, scale: CGFloat) -> UIImage? {
         let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
@@ -47,7 +52,7 @@ final class ImageDownsampleService {
         let scale = await MainActor.run { UIScreen.main.scale }
 
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await networkService.fetchData(from: url)
 
             guard let mimeType = (response as? HTTPURLResponse)?.mimeType, mimeType.hasPrefix("image") else {
                 Logger.shared.log(.debug,

@@ -22,32 +22,31 @@ final class NewsDetailsViewModel: ObservableObject {
     }
 
     func fetchImages(with targetSize: CGSize) async {
-        guard let urlString = newsData.titleImageUrl, !urlString.isEmpty else { return }
+        guard let (baseUrl, fileExtension) = parseImageURLComponents() else { return }
 
-        if let underscore = urlString.range(of: "_", options: .backwards),
-           let dot = urlString.range(of: ".", options: .backwards) {
-            let baseUrl = String(urlString[..<underscore.lowerBound]) + "_"
-            let fileExtension = String(urlString[dot.lowerBound...])
+        var index = 1
+        while index <= 10 {
+            let urlString = "\(baseUrl)\(index)\(fileExtension)"
+            guard let url = URL(string: urlString) else { break }
 
-            var index = 1
-
-            while true {
-                let fullUrlString = baseUrl + "\(index)" + fileExtension
-
-                guard let url = URL(string: fullUrlString) else { break }
-
-                if let image = await ImageDownsampleService.shared.loadImage(from: url, targetSize: targetSize) {
-                    images.append(image)
-                    index += 1
-                } else {
-                    break
-                }
-            }
-        } else {
-            if let url = URL(string: urlString),
-               let image = await ImageDownsampleService.shared.loadImage(from: url, targetSize: targetSize) {
+            if let image = await ImageDownsampleService.shared.loadImage(from: url, targetSize: targetSize) {
                 images.append(image)
+                index += 1
+            } else {
+                break
             }
         }
+    }
+
+    private func parseImageURLComponents() -> (base: String, ext: String)? {
+        guard let urlString = newsData.titleImageUrl, !urlString.isEmpty else { return nil }
+
+        if let underscore = urlString.lastIndex(of: "_"),
+           let dot = urlString.lastIndex(of: ".") {
+            let base = String(urlString[..<underscore]) + "_"
+            let ext = String(urlString[dot...])
+            return (base, ext)
+        }
+        return nil
     }
 }
