@@ -61,14 +61,7 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-
-        gradientView.frame = CGRect(
-            x: 0.0,
-            y: containerView.bounds.height - 50.0,
-            width: containerView.bounds.width,
-            height: 50.0
-        )
-        gradientLayer?.frame = gradientView.bounds
+        updateGradientFrame()
     }
 
     override func prepareForReuse() {
@@ -97,28 +90,41 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
             titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -8),
             titleLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -8)
         ])
-        addGradientView()
+        createGradientIfNeeded()
     }
 
-    private func addGradientView() {
-        gradientView.frame = CGRect(
-            x: 0.0,
-            y: containerView.bounds.height - 50.0,
-            width: containerView.bounds.width,
-            height: 50.0
-        )
+    private func createGradientIfNeeded() {
+        guard gradientLayer == nil else { return }
+
         let gradient = CAGradientLayer()
-        gradient.frame = gradientView.bounds
-        gradient.colors = [UIColor.black.withAlphaComponent(0).cgColor,
-                           UIColor.black.withAlphaComponent(1).cgColor
+        gradient.colors = [
+            UIColor.black.withAlphaComponent(0).cgColor,
+            UIColor.black.withAlphaComponent(1).cgColor
         ]
         gradient.locations = [0.0, 1.0]
         gradientView.layer.insertSublayer(gradient, at: 0)
         self.gradientLayer = gradient
 
-        if gradientView.superview == nil {
-            containerView.setupView(gradientView)
-        }
+        updateGradientFrame()
+    }
+
+    private func updateGradientFrame() {
+        guard let gradientLayer = gradientLayer else { return }
+
+        let gradientHeight: CGFloat = 50.0
+        let yPosition = containerView.bounds.height - gradientHeight
+
+        gradientView.frame = CGRect(
+            x: 0,
+            y: yPosition,
+            width: containerView.bounds.width,
+            height: gradientHeight
+        )
+
+        gradientLayer.frame = gradientView.bounds
+
+        gradientLayer.removeAllAnimations()
+        gradientView.layer.displayIfNeeded()
     }
 }
 
