@@ -66,7 +66,7 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
             x: 0.0,
             y: containerView.bounds.height - 50.0,
             width: containerView.bounds.width,
-            height: 60.0
+            height: 50.0
         )
         gradientLayer?.frame = gradientView.bounds
     }
@@ -105,12 +105,13 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
             x: 0.0,
             y: containerView.bounds.height - 50.0,
             width: containerView.bounds.width,
-            height: 60.0
+            height: 50.0
         )
         let gradient = CAGradientLayer()
         gradient.frame = gradientView.bounds
-        gradient.colors = [UIColor.clear.cgColor,
-                           UIColor.black.withAlphaComponent(0.7).cgColor]
+        gradient.colors = [UIColor.black.withAlphaComponent(0).cgColor,
+                           UIColor.black.withAlphaComponent(1).cgColor
+        ]
         gradient.locations = [0.0, 1.0]
         gradientView.layer.insertSublayer(gradient, at: 0)
         self.gradientLayer = gradient

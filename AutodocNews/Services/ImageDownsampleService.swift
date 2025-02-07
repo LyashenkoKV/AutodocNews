@@ -47,7 +47,16 @@ final class ImageDownsampleService {
         let scale = await MainActor.run { UIScreen.main.scale }
 
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await URLSession.shared.data(from: url)
+
+            guard let mimeType = (response as? HTTPURLResponse)?.mimeType, mimeType.hasPrefix("image") else {
+                Logger.shared.log(.debug,
+                                  message: "Invalid MIME type:",
+                                  metadata: ["⚠️": String(describing: (response as? HTTPURLResponse)?.mimeType)]
+                )
+                return nil
+            }
+
             if let image = downsample(imageData: data, to: targetSize, scale: scale) {
                 cache.setObject(image, forKey: cacheKey)
                 return image
@@ -59,6 +68,7 @@ final class ImageDownsampleService {
                 metadata: ["❌": error.localizedDescription]
             )
         }
+
         return nil
     }
 }

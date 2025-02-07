@@ -19,6 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         let navigationController = UINavigationController()
+        navigationController.navigationBar.tintColor = .systemRed
         let newsListVC = NewsListViewController()
         newsListVC.router = AppRouter(navigationController: navigationController)
         navigationController.viewControllers = [newsListVC]

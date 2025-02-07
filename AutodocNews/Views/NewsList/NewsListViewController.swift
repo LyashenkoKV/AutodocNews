@@ -10,8 +10,11 @@ import Combine
 
 final class NewsListViewController: UIViewController {
 
+    var router: Router?
+
     private let viewModel = NewsViewModel()
     private var cancellables = Set<AnyCancellable>()
+    private let refreshControl = UIRefreshControl()
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: createLayout())
@@ -23,19 +26,45 @@ final class NewsListViewController: UIViewController {
         return collectionView
     }()
 
-    var router: Router?
+    private lazy var loading: UIActivityIndicatorView = {
+        let activityIndicator  = UIActivityIndicatorView()
+        activityIndicator.center = view.center
+        activityIndicator.style = .large
+        return activityIndicator
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         bindViewModel()
         viewModel.loadNews()
+        setupViews()
     }
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
         title = NSLocalizedString("News", comment: "Autodoc News")
         view.setupView(collectionView)
+    }
+
+    func startLoading() {
+        loading.startAnimating()
+    }
+
+    func stopLoading() {
+        loading.stopAnimating()
+        refreshControl.endRefreshing()
+    }
+
+    func setupViews() {
+        view.setupView(loading)
+        collectionView.setupView(refreshControl)
+        loading.constraintCenters(to: view)
+        refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
+    }
+
+    @objc func refresh(_ sender: AnyObject) {
+        viewModel.loadNews()
     }
 }
 
@@ -67,6 +96,7 @@ extension NewsListViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.collectionView.reloadData()
+                self?.stopLoading()
             }
             .store(in: &cancellables)
     }
