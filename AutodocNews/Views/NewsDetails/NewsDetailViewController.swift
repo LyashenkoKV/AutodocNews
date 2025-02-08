@@ -37,7 +37,7 @@ final class NewsDetailViewController: UIViewController {
         setupUI()
         bindViewModel()
 
-        let targetSize = CGSize(width: view.bounds.width, height: 300)
+        let targetSize = CGSize(width: view.bounds.width, height: Heights.Height600x260)
         Task {
             await viewModel.fetchImages(with: targetSize)
         }
@@ -109,7 +109,7 @@ extension NewsDetailViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerLabel = UILabel()
-        headerLabel.font = .bold34
+        headerLabel.font = .bold41x34
         headerLabel.textAlignment = .left
         headerLabel.text = "Новости"
         return headerLabel

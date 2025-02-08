@@ -11,10 +11,11 @@ import Combine
 @MainActor
 final class NewsDetailsViewModel: ObservableObject {
 
-    @Published var images: [UIImage] = []
+    @Published private(set) var images: [UIImage] = []
 
     private let newsData: News
     private let imageService: ImageServiceProtocol
+    private var isLoading = false
 
     var news: News { newsData }
 
@@ -26,20 +27,34 @@ final class NewsDetailsViewModel: ObservableObject {
     }
 
     func fetchImages(with targetSize: CGSize) async {
-        guard let (baseUrl, fileExtension) = parseImageURLComponents() else { return }
+        guard !isLoading else { return }
+        isLoading = true
 
-        var index = 1
-        while index <= 10 {
+        guard let (baseUrl, fileExtension) = parseImageURLComponents() else {
+            isLoading = false
+            return
+        }
+
+        var newImages: [UIImage] = []
+        var index = images.count + 1 
+
+        while index <= images.count + 10 {
             let urlString = "\(baseUrl)\(index)\(fileExtension)"
             guard let url = URL(string: urlString) else { break }
 
             if let image = await imageService.loadImage(from: url, targetSize: targetSize) {
-                images.append(image)
+                newImages.append(image)
                 index += 1
             } else {
                 break
             }
         }
+
+        if !newImages.isEmpty {
+            images.append(contentsOf: newImages)
+        }
+
+        isLoading = false
     }
 
     private func parseImageURLComponents() -> (base: String, ext: String)? {

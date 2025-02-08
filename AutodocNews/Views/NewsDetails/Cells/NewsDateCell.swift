@@ -11,7 +11,7 @@ final class NewsDateCell: UITableViewCell, ReuseIdentifying {
 
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .medium10
+        label.font = .medium18x10
         label.textColor = .secondaryLabel
         return label
     }()

@@ -11,7 +11,7 @@ final class NewsTextCell: UITableViewCell, ReuseIdentifying {
 
     private let textView: UITextView = {
         let tv = UITextView()
-        tv.font = .regular13
+        tv.font = .regular20x13
         tv.isEditable = false
         tv.isScrollEnabled = false
         tv.textContainerInset = UIEdgeInsets(top: 8,

@@ -11,7 +11,7 @@ final class NewsHStackCell: UITableViewCell, ReuseIdentifying {
 
     private let headlineLabel: UILabel = {
         let label = UILabel()
-        label.font = .bold17
+        label.font = .bold25x17
         label.numberOfLines = 0
         return label
     }()

@@ -33,7 +33,7 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.font = .regular25x17
         label.textColor = .white
         return label
     }()
@@ -114,7 +114,7 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
     private func updateGradientFrame() {
         guard let gradientLayer = gradientLayer else { return }
 
-        let gradientHeight: CGFloat = 50.0
+        let gradientHeight: CGFloat = Heights.height50
         let yPosition = containerView.bounds.height - gradientHeight
 
         gradientView.frame = CGRect(

@@ -34,10 +34,9 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
         }
         imageScrollView.delegate = self
         imageScrollView.constraintEdges(to: contentView)
-        let height: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 600 : 260
 
         NSLayoutConstraint.activate([
-            imageScrollView.heightAnchor.constraint(equalToConstant: height),
+            imageScrollView.heightAnchor.constraint(equalToConstant: Heights.Height600x260),
 
             pageControl.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             pageControl.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4)
@@ -53,7 +52,6 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
         imageScrollView.subviews.forEach { $0.removeFromSuperview() }
 
         let width = contentView.bounds.width
-        let height: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 600 : 260
 
         for (index, image) in images.enumerated() {
             let iv = UIImageView(image: image)
@@ -61,11 +59,11 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
             iv.clipsToBounds = true
             iv.frame = CGRect(x: CGFloat(index) * width,
                               y: 0, width: width,
-                              height: height)
+                              height: Heights.Height600x260)
             imageScrollView.addSubview(iv)
         }
         imageScrollView.contentSize = CGSize(width: width * CGFloat(images.count),
-                                             height: height)
+                                             height: Heights.Height600x260)
         pageControl.numberOfPages = images.count
     }
 
