@@ -10,6 +10,16 @@
 		246210212D54C59100C8E1C5 /* AutodocNews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutodocNews.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		246210332D54C59400C8E1C5 /* Exceptions for "AutodocNews" folder in "AutodocNews" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/Info.plist,
+			);
+			target = 246210202D54C59100C8E1C5 /* AutodocNews */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		246210232D54C59100C8E1C5 /* AutodocNews */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;

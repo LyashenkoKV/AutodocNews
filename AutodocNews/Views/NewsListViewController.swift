@@ -1,19 +1,19 @@
 //
-//  ViewController.swift
+//  NewsListViewController.swift
 //  AutodocNews
 //
 //  Created by Konstantin Lyashenko on 06.02.2025.
 //
 
 import UIKit
+import Combine
 
-class ViewController: UIViewController {
+final class NewsListViewController: UIViewController {
+
+    var router: Router?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
     }
-
-
 }
-
