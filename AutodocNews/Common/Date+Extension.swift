@@ -13,14 +13,18 @@ extension Date {
         let calendar = Calendar.current
         let russianLocale = Locale(identifier: "ru_RU")
 
+        let currentYear = calendar.component(.year, from: Date())
+        let targetYear = calendar.component(.year, from: self)
+
         if calendar.isDateInToday(self) {
             return "Сегодня"
         } else if calendar.isDateInYesterday(self) {
             return "Вчера"
         } else {
-            formatter.dateFormat = "d MMMM"
+            let yearFormat = (targetYear != currentYear) ? " yyyy" : ""
+            formatter.dateFormat = "d MMMM\(yearFormat)"
             formatter.locale = russianLocale
-            return formatter.string(from: self)
+            return formatter.string(from: self).lowercased()
         }
     }
 }

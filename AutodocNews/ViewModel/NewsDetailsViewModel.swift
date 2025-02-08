@@ -11,14 +11,18 @@ import Combine
 @MainActor
 final class NewsDetailsViewModel: ObservableObject {
 
+    @Published var images: [UIImage] = []
+
     private let newsData: News
+    private let imageService: ImageServiceProtocol
 
     var news: News { newsData }
 
-    @Published var images: [UIImage] = []
-
-    init(news: News) {
+    init(news: News,
+         imageService: ImageServiceProtocol = ImageService()
+    ) {
         self.newsData = news
+        self.imageService = imageService
     }
 
     func fetchImages(with targetSize: CGSize) async {
@@ -29,7 +33,7 @@ final class NewsDetailsViewModel: ObservableObject {
             let urlString = "\(baseUrl)\(index)\(fileExtension)"
             guard let url = URL(string: urlString) else { break }
 
-            if let image = await ImageDownsampleService.shared.loadImage(from: url, targetSize: targetSize) {
+            if let image = await imageService.loadImage(from: url, targetSize: targetSize) {
                 images.append(image)
                 index += 1
             } else {

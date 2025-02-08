@@ -117,7 +117,7 @@ extension NewsListViewController {
         viewModel.$isLoading
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoading in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 if self.refreshControl.isRefreshing {
                     return

@@ -10,6 +10,8 @@ import UIKit
 @MainActor
 final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
+    private let imageService: ImageServiceProtocol
+
     // MARK: - UI Elements
 
     private lazy var containerView: UIView = {
@@ -47,6 +49,7 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
     // MARK: - Init
 
     override init(frame: CGRect) {
+        self.imageService = ImageService()
         super.init(frame: frame)
         contentView.backgroundColor = .systemBackground
         setupViews()
@@ -139,7 +142,7 @@ extension NewsCell {
             let targetSize = CGSize(width: bounds.width - 32, height: bounds.height - 16)
 
             Task {
-                let image = await ImageDownsampleService.shared.loadImage(from: url, targetSize: targetSize)
+                let image = await imageService.loadImage(from: url, targetSize: targetSize)
                 UIView.transition(with: newsImageView,
                                   duration: 0.25,
                                   options: .transitionCrossDissolve) {

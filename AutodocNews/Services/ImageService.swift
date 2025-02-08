@@ -8,38 +8,21 @@
 import UIKit
 import ImageIO
 
-final class ImageDownsampleService {
+protocol ImageServiceProtocol {
+    func loadImage(from url: URL, targetSize: CGSize) async -> UIImage?
+}
 
-    static let shared = ImageDownsampleService(networkService: NetworkService())
+final class ImageService: ImageServiceProtocol {
 
     private let cache = NSCache<NSString, UIImage>()
     private let networkService: NetworkServiceProtocol
+    private let imageDownsampleProcessor: ImageDownsampleProcessorProtocol
 
-    init(networkService: NetworkServiceProtocol) {
+    init(networkService: NetworkServiceProtocol = NetworkService(),
+         imageDownsampleProcessor: ImageDownsampleProcessorProtocol = ImageDownsampleProcessor()
+    ) {
         self.networkService = networkService
-    }
-
-    private func downsample(imageData: Data, to pointSize: CGSize, scale: CGFloat) -> UIImage? {
-        let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
-        guard let imageSource = CGImageSourceCreateWithData(imageData as CFData,
-                                                            imageSourceOptions) else { return nil }
-
-        let maxDimension = max(pointSize.width, pointSize.height) * scale
-        let downsampleOptions = [
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceShouldCacheImmediately: true,
-            kCGImageSourceThumbnailMaxPixelSize: maxDimension
-        ] as CFDictionary
-
-        guard let downsampleImage = CGImageSourceCreateThumbnailAtIndex(
-            imageSource,
-            0,
-            downsampleOptions
-        ) else {
-            return nil
-        }
-
-        return UIImage(cgImage: downsampleImage)
+        self.imageDownsampleProcessor = imageDownsampleProcessor
     }
 
     func loadImage(from url: URL, targetSize: CGSize) async -> UIImage? {
@@ -62,10 +45,12 @@ final class ImageDownsampleService {
                 return nil
             }
 
-            if let image = downsample(imageData: data, to: targetSize, scale: scale) {
-                cache.setObject(image, forKey: cacheKey)
-                return image
-            }
+            let image = try imageDownsampleProcessor.downsample(data: data,
+                                                                to: targetSize,
+                                                                scale: scale)
+
+            cache.setObject(image, forKey: cacheKey)
+            return image
         } catch {
             Logger.shared.log(
                 .error,
@@ -73,7 +58,6 @@ final class ImageDownsampleService {
                 metadata: ["❌": error.localizedDescription]
             )
         }
-
         return nil
     }
 }
