@@ -23,9 +23,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		246210232D54C59100C8E1C5 /* AutodocNews */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				246210332D54C59400C8E1C5 /* Exceptions for "AutodocNews" folder in "AutodocNews" target */,
-			);
 			path = AutodocNews;
 			sourceTree = "<group>";
 		};
