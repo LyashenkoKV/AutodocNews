@@ -107,11 +107,14 @@ extension NewsDetailViewController: UITableViewDelegate, UITableViewDataSource {
             }
     }
 
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    func tableView(
+        _ tableView: UITableView,
+        viewForHeaderInSection section: Int
+    ) -> UIView? {
         let headerLabel = UILabel()
         headerLabel.font = .bold41x34
         headerLabel.textAlignment = .left
-        headerLabel.text = "Новости"
+        headerLabel.text = GlobalConstants.headerTitle
         return headerLabel
     }
 }

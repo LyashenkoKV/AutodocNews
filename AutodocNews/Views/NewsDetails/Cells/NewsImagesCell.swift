@@ -17,18 +17,31 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
     }()
 
     private let pageControl: UIPageControl = {
-        let pc = UIPageControl()
-        pc.hidesForSinglePage = true
-        pc.currentPageIndicatorTintColor = .white
-        pc.pageIndicatorTintColor = .lightGray
-        pc.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        return pc
+        let page = UIPageControl()
+        page.hidesForSinglePage = true
+        page.currentPageIndicatorTintColor = .white
+        page.pageIndicatorTintColor = .lightGray
+        page.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        return page
     }()
 
+    private let shimmerView = ShimmerView()
     private var images: [UIImage] = []
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupUI()
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError() }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        shimmerView.layoutIfNeeded()
+    }
+
+    private func setupUI() {
         [imageScrollView, pageControl].forEach {
             contentView.setupView($0)
         }
@@ -41,30 +54,44 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
             pageControl.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             pageControl.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4)
         ])
+        contentView.setupView(shimmerView)
+        shimmerView.constraintEdges(to: imageScrollView)
     }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError() }
 
     func configure(with images: [UIImage]) {
         self.images = images
 
-        imageScrollView.subviews.forEach { $0.removeFromSuperview() }
+        if images.isEmpty {
+            shimmerView.isHidden = false
+            shimmerView.startShimmer()
 
-        let width = contentView.bounds.width
+            imageScrollView.subviews.forEach {
+                if $0 is UIImageView { $0.removeFromSuperview() }
+            }
+            pageControl.isHidden = true
+        } else {
+            shimmerView.stopShimmer()
+            shimmerView.isHidden = true
 
-        for (index, image) in images.enumerated() {
-            let iv = UIImageView(image: image)
-            iv.contentMode = .scaleAspectFill
-            iv.clipsToBounds = true
-            iv.frame = CGRect(x: CGFloat(index) * width,
-                              y: 0, width: width,
-                              height: Heights.Height600x260)
-            imageScrollView.addSubview(iv)
+            imageScrollView.subviews.forEach {
+                if $0 is UIImageView { $0.removeFromSuperview() }
+            }
+            let width = contentView.bounds.width
+
+            for (index, image) in images.enumerated() {
+                let imageView = UIImageView(image: image)
+                imageView.contentMode = .scaleAspectFill
+                imageView.clipsToBounds = true
+                imageView.frame = CGRect(x: CGFloat(index) * width,
+                                         y: 0, width: width,
+                                         height: Heights.Height600x260)
+                imageScrollView.addSubview(imageView)
+            }
+            imageScrollView.contentSize = CGSize(width: width * CGFloat(images.count),
+                                                 height: Heights.Height600x260)
+            pageControl.numberOfPages = images.count
+            pageControl.isHidden = false
         }
-        imageScrollView.contentSize = CGSize(width: width * CGFloat(images.count),
-                                             height: Heights.Height600x260)
-        pageControl.numberOfPages = images.count
     }
 
     // MARK: - UIScrollViewDelegate
@@ -76,4 +103,3 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
         pageControl.currentPage = page
     }
 }
-

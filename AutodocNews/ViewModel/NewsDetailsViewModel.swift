@@ -9,7 +9,7 @@ import UIKit
 import Combine
 
 @MainActor
-final class NewsDetailsViewModel: ObservableObject {
+final class NewsDetailsViewModel {
 
     @Published private(set) var images: [UIImage] = []
 

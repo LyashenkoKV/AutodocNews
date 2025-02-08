@@ -15,10 +15,10 @@ enum ImageLoadingError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidMIMEType: "Неподдерживаемый тип изображения"
-        case .downloadFailed(let error): "Ошибка загрузки: \(error.localizedDescription)"
-        case .imageProcessingFailed: "Не удалось обработать изображение"
-        case .cancelled: "Операция отменена"
+        case .invalidMIMEType: GlobalConstants.invalidMIMEType
+        case .downloadFailed(let error): GlobalConstants.downloadFailed + "\(error.localizedDescription)"
+        case .imageProcessingFailed: GlobalConstants.imageProcessingFailed
+        case .cancelled: GlobalConstants.cancelled
         }
     }
 }

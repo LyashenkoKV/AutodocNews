@@ -35,7 +35,8 @@ enum NewsCellFactory {
             cell.configure(with: viewModel.images)
             return cell
         default:
-            fatalError("Unexpected cell index")
+            Logger.shared.log(.error, message: "Unexpected cell index")
+            fatalError()
         }
     }
 }
