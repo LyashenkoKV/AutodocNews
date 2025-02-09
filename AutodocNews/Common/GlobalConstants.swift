@@ -12,9 +12,8 @@ enum GlobalConstants {
     static let logSubsystem = "KV.Lyashenko.AutodocNews"
     static let logCategory = "news"
 
-    // ActionSheetPresenter
+    // CustomActionSheetController
     static let copyLink = "Скопировать ссылку"
-    static let shareLink = "Поделиться"
 
     // Common
     static let cancel = "Отмена"

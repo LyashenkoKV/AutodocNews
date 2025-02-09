@@ -51,7 +51,6 @@ final class NewsDetailViewController: UIViewController {
     }
 
     private func configureTableView() {
-        tableView.delegate = self
         tableView.dataSource = self
         tableView.separatorStyle = .none
         tableView.estimatedRowHeight = 44
@@ -74,18 +73,19 @@ final class NewsDetailViewController: UIViewController {
     }
 
     private func showShareActions() {
-        ActionSheetPresenter.presentShareActions(
-            from: self,
+        let actionSheet = CustomActionSheetController()
+        actionSheet.present(
+            in: self,
+            link: viewModel.news.fullUrl,
             title: viewModel.news.title,
-            message: viewModel.news.publishedDate.formattedRelativeDate(),
-            url: viewModel.news.fullUrl
+            date: viewModel.news.publishedDate.formattedRelativeDate()
         )
     }
 }
 
 // MARK: - UITableViewDelegate, UITableViewDataSource
 
-extension NewsDetailViewController: UITableViewDelegate, UITableViewDataSource {
+extension NewsDetailViewController: UITableViewDataSource {
 
     func tableView(
         _ tableView: UITableView,
@@ -107,7 +107,7 @@ extension NewsDetailViewController: UITableViewDelegate, UITableViewDataSource {
             }
     }
 
-    func tableView(
+    private func tableView(
         _ tableView: UITableView,
         viewForHeaderInSection section: Int
     ) -> UIView? {
