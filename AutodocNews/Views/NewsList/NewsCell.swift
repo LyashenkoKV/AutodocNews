@@ -17,8 +17,8 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
     private lazy var containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .black
-        view.layer.cornerRadius = 16
-        view.clipsToBounds = true
+        view.layer.shouldRasterize = true
+        view.layer.rasterizationScale = UIScreen.main.scale
         return view
     }()
 
@@ -44,6 +44,14 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
         return view
     }()
 
+    private func applyRoundedCorners() {
+        let path = UIBezierPath(roundedRect: containerView.bounds,
+                                cornerRadius: 16)
+        let maskLayer = CAShapeLayer()
+        maskLayer.path = path.cgPath
+        containerView.layer.mask = maskLayer
+    }
+
     private var gradientLayer: CAGradientLayer?
 
     // MARK: - Init
@@ -64,6 +72,7 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        applyRoundedCorners()
         updateGradientFrame()
     }
 
