@@ -17,9 +17,9 @@ extension Date {
         let targetYear = calendar.component(.year, from: self)
 
         if calendar.isDateInToday(self) {
-            return "Сегодня"
+            return GlobalConstants.today
         } else if calendar.isDateInYesterday(self) {
-            return "Вчера"
+            return GlobalConstants.yesterday
         } else {
             let yearFormat = (targetYear != currentYear) ? " yyyy" : ""
             formatter.dateFormat = "d MMMM\(yearFormat)"

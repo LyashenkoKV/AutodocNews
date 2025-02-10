@@ -9,6 +9,8 @@ import UIKit
 
 final class NewsHStackCell: UITableViewCell, ReuseIdentifying {
 
+    // MARK: - Private Properties
+
     private let headlineLabel: UILabel = {
         let label = UILabel()
         label.font = .bold25x17
@@ -31,6 +33,8 @@ final class NewsHStackCell: UITableViewCell, ReuseIdentifying {
         return stack
     }()
 
+    // MARK: - Init
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.setupView(hStack)
@@ -46,6 +50,8 @@ final class NewsHStackCell: UITableViewCell, ReuseIdentifying {
     
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
+
+    // MARK: - Setup Method
 
     func configure(headline: String, sharedAction: @escaping () -> Void) {
         headlineLabel.text = headline

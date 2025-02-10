@@ -8,6 +8,10 @@
 import Foundation
 
 enum GlobalConstants {
+    // Date
+    static let today = "Сегодня"
+    static let yesterday = "Вчера"
+
     // Logger
     static let logSubsystem = "KV.Lyashenko.AutodocNews"
     static let logCategory = "news"

@@ -9,7 +9,9 @@ import UIKit
 
 final class CustomActionSheetController: UIViewController {
 
-    private let titleLabel: UILabel = {
+    // MARK: - Private properties
+
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .bold25x17
         label.textColor = .label
@@ -17,14 +19,14 @@ final class CustomActionSheetController: UIViewController {
         return label
     }()
 
-    private let dateLabel: UILabel = {
+    private lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.font = .medium18x10
         label.textColor = .secondaryLabel
         return label
     }()
 
-    private let shareButton: UIButton = {
+    private lazy var shareButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
         button.tintColor = .label
@@ -32,7 +34,7 @@ final class CustomActionSheetController: UIViewController {
         return button
     }()
 
-    private let copyButton: UIButton = {
+    private lazy var copyButton: UIButton = {
         let button = UIButton(type: .system)
 
         var configuration = UIButton.Configuration.plain()
@@ -57,7 +59,7 @@ final class CustomActionSheetController: UIViewController {
         return button
     }()
 
-    private let cancelButton: UIButton = {
+    private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(GlobalConstants.cancel, for: .normal)
         button.setTitleColor(.white, for: .normal)
@@ -69,7 +71,7 @@ final class CustomActionSheetController: UIViewController {
         return button
     }()
 
-    private let containerView: UIView = {
+    private lazy var containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemBackground
         view.layer.cornerRadius = 16
@@ -77,13 +79,15 @@ final class CustomActionSheetController: UIViewController {
         return view
     }()
 
-    private let backgroundView: UIView = {
+    private lazy var backgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.black.withAlphaComponent(0.4)
         return view
     }()
 
-    var link: String?
+    private var link: String?
+
+    // MARK: - Life cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -95,6 +99,8 @@ final class CustomActionSheetController: UIViewController {
         super.viewWillAppear(animated)
         animateAppearance()
     }
+
+    // MARK: - Setup UI
 
     private func setupUI() {
         view.setupView(backgroundView)
@@ -147,6 +153,8 @@ final class CustomActionSheetController: UIViewController {
         }
     }
 
+    // MARK: - Private Methods
+
     private func setupActions() {
         backgroundView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissSheet)))
         cancelButton.addTarget(self, action: #selector(dismissSheet), for: .touchUpInside)
@@ -185,6 +193,8 @@ final class CustomActionSheetController: UIViewController {
             self.backgroundView.alpha = 1
         }
     }
+
+    // MARK: - Setup Method
 
     func present(in parent: UIViewController,
                  link: String,

@@ -10,7 +10,11 @@ import Combine
 
 final class NewsListViewController: UIViewController {
 
+    // MARK: - Properties
+
     var router: Router?
+
+    // MARK: - Private Properties
 
     private let viewModel = NewsViewModel()
     private var cancellables = Set<AnyCancellable>()
@@ -18,11 +22,6 @@ final class NewsListViewController: UIViewController {
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: createLayout())
-        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        collectionView.backgroundColor = .systemBackground
-        collectionView.register(NewsCell.self)
-        collectionView.delegate = self
-        collectionView.dataSource = self
         return collectionView
     }()
 
@@ -33,29 +32,33 @@ final class NewsListViewController: UIViewController {
         return activityIndicator
     }()
 
+    // MARK: - life cycles
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        configureCollectionView()
         bindViewModel()
         viewModel.loadNews()
         setupViews()
     }
+
+    // MARK: - Setup UI
 
     private func setupUI() {
         view.backgroundColor = .systemBackground
         view.setupView(collectionView)
     }
 
-    func startLoading() {
-        loading.startAnimating()
+    private func configureCollectionView() {
+        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        collectionView.backgroundColor = .systemBackground
+        collectionView.register(NewsCell.self)
+        collectionView.delegate = self
+        collectionView.dataSource = self
     }
 
-    func stopLoading() {
-        loading.stopAnimating()
-        if refreshControl.isRefreshing {
-            refreshControl.endRefreshing()
-        }
-    }
+    // MARK: - Methods
 
     func setupViews() {
         view.setupView(loading)
@@ -66,8 +69,24 @@ final class NewsListViewController: UIViewController {
                                  for: .valueChanged)
     }
 
-    @objc func refresh(_ sender: AnyObject) {
+    @objc private func refresh(_ sender: AnyObject) {
         viewModel.loadNews()
+    }
+}
+
+// MARK: - Load animation
+
+extension NewsListViewController {
+
+    private func startLoading() {
+        loading.startAnimating()
+    }
+
+    private func stopLoading() {
+        loading.stopAnimating()
+        if refreshControl.isRefreshing {
+            refreshControl.endRefreshing()
+        }
     }
 }
 

@@ -8,13 +8,22 @@
 import Foundation
 
 final class NetworkManager {
+
+    // MARK: - Singleton
+
     static let shared = NetworkManager(networkService: NetworkService())
 
+    // MARK: - Private Method
+
     private let networkService: NetworkServiceProtocol
+
+    // MARK: - Init
 
     init(networkService: NetworkServiceProtocol) {
         self.networkService = networkService
     }
+
+    // MARK: - Method
 
     func fetchNews(page: Int) async throws -> NewsResponse {
         guard let url = URL(string: "https://webapi.autodoc.ru/api/news/\(page)/15") else {

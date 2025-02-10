@@ -10,9 +10,9 @@ import UIKit
 @MainActor
 final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
-    private let imageService: ImageServiceProtocol
+    // MARK: - Private Properties
 
-    // MARK: - UI Elements
+    private let imageService: ImageServiceProtocol
 
     private lazy var containerView: UIView = {
         let view = UIView()

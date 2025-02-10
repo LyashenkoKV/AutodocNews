@@ -7,7 +7,9 @@
 
 import UIKit
 
-final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentifying {
+final class NewsImagesCell: UITableViewCell, ReuseIdentifying {
+
+    // MARK: - Private Properties
 
     private let imageScrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -28,6 +30,8 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
     private let shimmerView = ShimmerView()
     private var images: [UIImage] = []
 
+    // MARK: - Init
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -36,10 +40,14 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
+    // MARK: - Life cycle
+
     override func layoutSubviews() {
         super.layoutSubviews()
         shimmerView.layoutIfNeeded()
     }
+
+    // MARK: - Setup UI
 
     private func setupUI() {
         [imageScrollView, pageControl].forEach {
@@ -57,7 +65,11 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
         contentView.setupView(shimmerView)
         shimmerView.constraintEdges(to: imageScrollView)
     }
+}
 
+// MARK: - Configure cell
+
+extension NewsImagesCell {
     func configure(with images: [UIImage]) {
         self.images = images
 
@@ -93,9 +105,11 @@ final class NewsImagesCell: UITableViewCell, UIScrollViewDelegate, ReuseIdentify
             pageControl.isHidden = false
         }
     }
+}
 
-    // MARK: - UIScrollViewDelegate
+// MARK: - UIScrollViewDelegate
 
+extension NewsImagesCell: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let width = scrollView.frame.width
         guard width > 0 else { return }

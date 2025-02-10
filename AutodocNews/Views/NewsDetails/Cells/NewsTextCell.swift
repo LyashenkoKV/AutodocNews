@@ -9,6 +9,8 @@ import UIKit
 
 final class NewsTextCell: UITableViewCell, ReuseIdentifying {
 
+    // MARK: - Private Property
+
     private let textView: UITextView = {
         let tv = UITextView()
         tv.font = .regular20x13
@@ -21,6 +23,8 @@ final class NewsTextCell: UITableViewCell, ReuseIdentifying {
         return tv
     }()
 
+    // MARK: - Init
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.setupView(textView)
@@ -29,6 +33,8 @@ final class NewsTextCell: UITableViewCell, ReuseIdentifying {
 
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
+
+    // MARK: - Setup Method
 
     func configure(text: String) {
         textView.text = text

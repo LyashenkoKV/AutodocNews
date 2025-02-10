@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		24A342B22D5A041100954D59 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 246210192D54C59100C8E1C5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 246210202D54C59100C8E1C5;
+			remoteInfo = AutodocNews;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		246210212D54C59100C8E1C5 /* AutodocNews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutodocNews.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		24A342AE2D5A041000954D59 /* AutodocNewsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AutodocNewsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -29,10 +40,22 @@
 			path = AutodocNews;
 			sourceTree = "<group>";
 		};
+		24A342AF2D5A041100954D59 /* AutodocNewsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AutodocNewsTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		2462101E2D54C59100C8E1C5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		24A342AB2D5A041000954D59 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -46,6 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				246210232D54C59100C8E1C5 /* AutodocNews */,
+				24A342AF2D5A041100954D59 /* AutodocNewsTests */,
 				246210222D54C59100C8E1C5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				246210212D54C59100C8E1C5 /* AutodocNews.app */,
+				24A342AE2D5A041000954D59 /* AutodocNewsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,6 +108,29 @@
 			productReference = 246210212D54C59100C8E1C5 /* AutodocNews.app */;
 			productType = "com.apple.product-type.application";
 		};
+		24A342AD2D5A041000954D59 /* AutodocNewsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 24A342B42D5A041100954D59 /* Build configuration list for PBXNativeTarget "AutodocNewsTests" */;
+			buildPhases = (
+				24A342AA2D5A041000954D59 /* Sources */,
+				24A342AB2D5A041000954D59 /* Frameworks */,
+				24A342AC2D5A041000954D59 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				24A342B32D5A041100954D59 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				24A342AF2D5A041100954D59 /* AutodocNewsTests */,
+			);
+			name = AutodocNewsTests;
+			packageProductDependencies = (
+			);
+			productName = AutodocNewsTests;
+			productReference = 24A342AE2D5A041000954D59 /* AutodocNewsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -95,6 +143,10 @@
 				TargetAttributes = {
 					246210202D54C59100C8E1C5 = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					24A342AD2D5A041000954D59 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 246210202D54C59100C8E1C5;
 					};
 				};
 			};
@@ -114,12 +166,20 @@
 			projectRoot = "";
 			targets = (
 				246210202D54C59100C8E1C5 /* AutodocNews */,
+				24A342AD2D5A041000954D59 /* AutodocNewsTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2462101F2D54C59100C8E1C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		24A342AC2D5A041000954D59 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -136,7 +196,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		24A342AA2D5A041000954D59 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		24A342B32D5A041100954D59 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 246210202D54C59100C8E1C5 /* AutodocNews */;
+			targetProxy = 24A342B22D5A041100954D59 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		246210352D54C59400C8E1C5 /* Debug */ = {
@@ -324,6 +399,42 @@
 			};
 			name = Release;
 		};
+		24A342B52D5A041100954D59 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B497B3XW8R;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = KV.Lyashenko.AutodocNewsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AutodocNews.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AutodocNews";
+			};
+			name = Debug;
+		};
+		24A342B62D5A041100954D59 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B497B3XW8R;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = KV.Lyashenko.AutodocNewsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AutodocNews.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AutodocNews";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -341,6 +452,15 @@
 			buildConfigurations = (
 				246210352D54C59400C8E1C5 /* Debug */,
 				246210362D54C59400C8E1C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		24A342B42D5A041100954D59 /* Build configuration list for PBXNativeTarget "AutodocNewsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24A342B52D5A041100954D59 /* Debug */,
+				24A342B62D5A041100954D59 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

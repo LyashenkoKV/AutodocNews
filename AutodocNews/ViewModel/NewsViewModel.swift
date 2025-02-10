@@ -10,12 +10,19 @@ import Combine
 
 @MainActor
 final class NewsViewModel {
-    @Published var newsItems: [News] = []
-    @Published var totalCount = 0
-    @Published var isLoading = false
+
+    // MARK: - Published Properties
+
+    @Published private(set) var newsItems: [News] = []
+    @Published private(set) var totalCount = 0
+    @Published private(set) var isLoading = false
+
+    // MARK: - Private Properties
 
     private var currentPage = 1
     private var isFetching = false
+
+    // MARK: - Setup Methods
 
     func loadNews() {
         guard !isFetching, (newsItems.count < totalCount || totalCount == 0) else { return }

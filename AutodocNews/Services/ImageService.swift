@@ -14,9 +14,13 @@ protocol ImageServiceProtocol {
 
 final class ImageService: ImageServiceProtocol {
 
+    // MARK: - Private Properties
+
     private let cache = NSCache<NSString, UIImage>()
     private let networkService: NetworkServiceProtocol
     private let imageDownsampleProcessor: ImageDownsampleProcessorProtocol
+
+    // MARK: - Init
 
     init(networkService: NetworkServiceProtocol = NetworkService(),
          imageDownsampleProcessor: ImageDownsampleProcessorProtocol = ImageDownsampleProcessor()
@@ -24,6 +28,8 @@ final class ImageService: ImageServiceProtocol {
         self.networkService = networkService
         self.imageDownsampleProcessor = imageDownsampleProcessor
     }
+
+    // MARK: - Load Image Method
 
     func loadImage(from url: URL, targetSize: CGSize) async -> UIImage? {
         let cacheKey = url.absoluteString as NSString
@@ -37,7 +43,8 @@ final class ImageService: ImageServiceProtocol {
         do {
             let (data, response) = try await networkService.fetchData(from: url)
 
-            guard let mimeType = (response as? HTTPURLResponse)?.mimeType, mimeType.hasPrefix("image") else {
+            guard let mimeType = (response as? HTTPURLResponse)?.mimeType,
+                    mimeType.hasPrefix("image") else {
                 Logger.shared.log(.debug,
                                   message: "Invalid MIME type:",
                                   metadata: ["⚠️": String(describing: (response as? HTTPURLResponse)?.mimeType)]

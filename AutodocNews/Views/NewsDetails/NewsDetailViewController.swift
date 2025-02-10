@@ -52,7 +52,9 @@ final class NewsDetailViewController: UIViewController {
 
     private func configureTableView() {
         tableView.dataSource = self
+        tableView.delegate = self
         tableView.separatorStyle = .none
+        tableView.allowsSelection = false
         tableView.estimatedRowHeight = 44
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(NewsHStackCell.self)
@@ -61,15 +63,6 @@ final class NewsDetailViewController: UIViewController {
         tableView.register(NewsImagesCell.self)
         view.setupView(tableView)
         tableView.constraintEdges(to: view)
-    }
-
-    private func bindViewModel() {
-        viewModel.$images
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.tableView.reloadData()
-            }
-            .store(in: &cancellables)
     }
 
     private func showShareActions() {
@@ -83,7 +76,21 @@ final class NewsDetailViewController: UIViewController {
     }
 }
 
-// MARK: - UITableViewDelegate, UITableViewDataSource
+// MARK: - Binding
+
+extension NewsDetailViewController {
+
+    private func bindViewModel() {
+        viewModel.$images
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.tableView.reloadData()
+            }
+            .store(in: &cancellables)
+    }
+}
+
+// MARK: - UITableViewDataSource
 
 extension NewsDetailViewController: UITableViewDataSource {
 
@@ -106,8 +113,12 @@ extension NewsDetailViewController: UITableViewDataSource {
                 self?.showShareActions()
             }
     }
+}
 
-    private func tableView(
+// MARK: - UITableViewDelegate
+
+extension NewsDetailViewController: UITableViewDelegate {
+    func tableView(
         _ tableView: UITableView,
         viewForHeaderInSection section: Int
     ) -> UIView? {
