@@ -28,6 +28,11 @@ enum NewsCellFactory {
             return cell
         case 2:
             let cell: NewsTextCell = tableView.dequeueReusableCell()
+            // Беру только описание, т.к. апи дает только его
+            // Возможные варианты получения полного текста из урла:
+            // Можно использовать библиотеку к примеру SwiftSoup, для скрининга Html-страницы и достать текст,
+            // Можно открывать webWiew (или SafariVC)
+            // Лучшим вариантом все же получать текст из апихи
             cell.configure(text: viewModel.news.description)
             return cell
         case 3:
