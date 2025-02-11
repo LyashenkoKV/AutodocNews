@@ -40,31 +40,35 @@ final class ImageService: ImageServiceProtocol {
 
         let scale = await MainActor.run { UIScreen.main.scale }
 
-        do {
-            let (data, response) = try await networkService.fetchData(from: url)
+        var attempts = 3
 
-            guard let mimeType = (response as? HTTPURLResponse)?.mimeType,
-                    mimeType.hasPrefix("image") else {
-                Logger.shared.log(.debug,
-                                  message: "Invalid MIME type:",
-                                  metadata: ["⚠️": String(describing: (response as? HTTPURLResponse)?.mimeType)]
-                )
-                return nil
+        while attempts > 0 {
+            do {
+                let (data, response) = try await networkService.fetchData(from: url)
+
+                guard let mimeType = (response as? HTTPURLResponse)?.mimeType,
+                      mimeType.hasPrefix("image") else {
+                    Logger.shared.log(.debug, message: "Invalid MIME type:",
+                                      metadata: ["⚠️": String(describing: (response as? HTTPURLResponse)?.mimeType)])
+                    return nil
+                }
+
+                let image = try imageDownsampleProcessor.downsample(data: data, to: targetSize, scale: scale)
+
+                cache.setObject(image, forKey: cacheKey)
+                return image
+            } catch {
+                Logger.shared.log(.error, message: "Image load failed, attempts left: \(attempts - 1)",
+                                  metadata: ["❌": error.localizedDescription])
+                attempts -= 1
+
+                if attempts == 0 {
+                    return nil
+                }
             }
-
-            let image = try imageDownsampleProcessor.downsample(data: data,
-                                                                to: targetSize,
-                                                                scale: scale)
-
-            cache.setObject(image, forKey: cacheKey)
-            return image
-        } catch {
-            Logger.shared.log(
-                .error,
-                message: "Failed to load image:",
-                metadata: ["❌": error.localizedDescription]
-            )
+            try? await Task.sleep(nanoseconds: 500_000_000)
         }
+
         return nil
     }
 }
