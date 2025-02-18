@@ -13,6 +13,8 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
     // MARK: - Private Properties
 
     private let imageService: ImageServiceProtocol
+    private var currentNewsId: Int?
+    private var imageLoadTask: Task<Void, Never>?
 
     private lazy var containerView: UIView = {
         let view = UIView()
@@ -79,6 +81,9 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
     override func prepareForReuse() {
         super.prepareForReuse()
         newsImageView.image = nil
+        currentNewsId = nil
+        imageLoadTask?.cancel()
+        imageLoadTask = nil
     }
 
     // MARK: - Setup UI
@@ -145,17 +150,23 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 extension NewsCell {
 
     func configure(with news: News) {
+        currentNewsId = news.id
         titleLabel.text = news.title
+
+        imageLoadTask?.cancel()
 
         if let imageUrlString = news.titleImageUrl, let url = URL(string: imageUrlString) {
             let targetSize = CGSize(width: bounds.width - 32, height: bounds.height - 16)
 
-            Task {
+            imageLoadTask = Task {
                 let image = await imageService.loadImage(from: url, targetSize: targetSize)
-                UIView.transition(with: newsImageView,
-                                  duration: 0.25,
-                                  options: .transitionCrossDissolve) {
-                    self.newsImageView.image = image
+
+                if self.currentNewsId == news.id {
+                    UIView.transition(with: newsImageView,
+                                      duration: 0.25,
+                                      options: .transitionCrossDissolve) {
+                        self.newsImageView.image = image
+                    }
                 }
             }
         }

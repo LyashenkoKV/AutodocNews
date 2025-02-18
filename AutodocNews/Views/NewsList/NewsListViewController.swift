@@ -56,6 +56,7 @@ final class NewsListViewController: UIViewController {
         collectionView.register(NewsCell.self)
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.prefetchDataSource = self
     }
 
     // MARK: - Methods
@@ -170,10 +171,6 @@ extension NewsListViewController: UICollectionViewDelegate {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         let height = scrollView.frame.size.height
-
-        if offsetY > contentHeight - height * 2 {
-            viewModel.loadNews()
-        }
     }
 }
 
@@ -201,4 +198,14 @@ extension NewsListViewController: UICollectionViewDataSource {
         cell.configure(with: news)
         return cell
     }
+}
+
+extension NewsListViewController: UICollectionViewDataSourcePrefetching {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        prefetchItemsAt indexPaths: [IndexPath]) {
+            if indexPaths.contains(where: { $0.row >= viewModel.newsItems.count - 1 }) && !viewModel.isLoading {
+                viewModel.loadNews()
+            }
+        }
 }
