@@ -13,41 +13,44 @@ final class NewsViewModel {
 
     // MARK: - Published Properties
 
-    @Published private(set) var newsItems: [News] = []
-    @Published private(set) var totalCount = 0
-    @Published private(set) var isLoading = false
+    @Published private(set) var state: State<(newsItems: [News], totalCount: Int, currentPage: Int)> = .idle
 
-    // MARK: - Private Properties
+    // MARK: - Property
 
-    private var currentPage = 1
-    private var isFetching = false
+    var newsItems: [News] {
+        if case .loaded(let data) = state {
+            return data.newsItems
+        }
+        return []
+    }
 
     // MARK: - Setup Methods
 
     func loadNews() {
-        guard !isFetching, (newsItems.count < totalCount || totalCount == 0) else { return }
-        isFetching = true
-        isLoading = true
+        if case .loading = state { return }
+
+        if case .loaded(let data) = state, data.totalCount != 0, data.newsItems.count >= data.totalCount {
+            return
+        }
+
+        var previousItems: [News] = []
+        var currentPage = 1
+        if case .loaded(let data) = state {
+            previousItems = data.newsItems
+            currentPage = data.currentPage
+        }
+
+        state = .loading
 
         Task {
             do {
                 let newsResponse = try await NetworkManager.shared.fetchNews(page: currentPage)
-                let newItems = newsResponse.news
-
-                await MainActor.run {
-                    let updatedItems = self.newsItems + newItems
-                    self.newsItems = updatedItems
-                    self.totalCount = newsResponse.totalCount
-                    self.currentPage += 1
-                }
+                let newItems = previousItems + newsResponse.news
+                state = .loaded((newsItems: newItems,
+                                 totalCount: newsResponse.totalCount,
+                                 currentPage: currentPage + 1))
             } catch {
-                Logger.shared.log(.error,
-                                  message: "Error loading news:",
-                                  metadata: ["❌": error.localizedDescription])
-            }
-            await MainActor.run {
-                isFetching = false
-                isLoading = false
+                state = .error(error)
             }
         }
     }

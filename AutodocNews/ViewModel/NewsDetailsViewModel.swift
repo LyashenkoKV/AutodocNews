@@ -13,7 +13,7 @@ final class NewsDetailsViewModel {
 
     // MARK: - Published Properties
 
-    @Published private(set) var images: [UIImage] = []
+    @Published private(set) var state: State<[UIImage]> = .idle
 
     // MARK: - Private Properties
 
@@ -22,6 +22,13 @@ final class NewsDetailsViewModel {
     private var isLoading = false
 
     // MARK: - Properties
+
+    var images: [UIImage] {
+        if case .loaded(let images) = state {
+            return images
+        }
+        return []
+    }
 
     var news: News { newsData }
 
@@ -36,17 +43,17 @@ final class NewsDetailsViewModel {
 
     // MARK: - Parse Method
 
-    func parseImageURLComponents() -> (base: String, ext: String)? {
-        guard let urlString = newsData.titleImageUrl, !urlString.isEmpty else { return nil }
+    private func parseImageURLComponents() -> (base: String, ext: String)? {
+        guard let urlString = newsData.titleImageUrl,
+              !urlString.isEmpty else {
+            return nil
+        }
 
-        // Костыль, но все же:
-        // (.*_)        - захватываю любую последовательность символов до последнего нижнего подчеркивания (жадный режим),
-        //                включая само подчеркивание;
-        // (\\d+)       - затем должны идти одна или более цифр (номер изображения);
-        // (\\.[a-zA-Z]+)$ - и, наконец, точка с буквенным расширением до конца строки.
         let pattern = "(.*_)(\\d+)(\\.[a-zA-Z]+)$"
 
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else { return nil }
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+            return nil
+        }
 
         let nsString = urlString as NSString
         let results = regex.matches(in: urlString, options: [], range: NSRange(location: 0, length: nsString.length))
@@ -57,14 +64,13 @@ final class NewsDetailsViewModel {
 
         let base = nsString.substring(with: match.range(at: 1))
         let ext = nsString.substring(with: match.range(at: 3))
-
         return (base, ext)
     }
 
-    // MARK: - Setup Method
+    // MARK: - Fetch Method
 
     func fetchImages(with targetSize: CGSize) async {
-        guard !isLoading else { return }
+        if isLoading { return }
         isLoading = true
 
         guard let (baseUrl, fileExtension) = parseImageURLComponents() else {
@@ -72,10 +78,13 @@ final class NewsDetailsViewModel {
             return
         }
 
-        var newImages: [UIImage] = []
-        var index = images.count + 1
+        var currentImages = images
+        state = .loading
 
-        while index <= images.count + 10 {
+        var newImages: [UIImage] = []
+        var index = currentImages.count + 1
+
+        while index <= currentImages.count + 10 {
             let urlString = "\(baseUrl)\(index)\(fileExtension)"
             guard let url = URL(string: urlString) else { break }
 
@@ -87,10 +96,8 @@ final class NewsDetailsViewModel {
             }
         }
 
-        if !newImages.isEmpty {
-            images.append(contentsOf: newImages)
-        }
-
+        currentImages.append(contentsOf: newImages)
+        state = .loaded(currentImages)
         isLoading = false
     }
 }

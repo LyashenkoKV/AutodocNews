@@ -81,9 +81,9 @@ final class NewsDetailViewController: UIViewController {
 extension NewsDetailViewController {
 
     private func bindViewModel() {
-        viewModel.$images
+        viewModel.$state
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] (state: State<[UIImage]>) in
                 self?.tableView.reloadData()
             }
             .store(in: &cancellables)

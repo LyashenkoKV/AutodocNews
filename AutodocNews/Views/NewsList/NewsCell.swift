@@ -158,13 +158,11 @@ extension NewsCell {
         if let imageUrlString = news.titleImageUrl, let url = URL(string: imageUrlString) {
             let targetSize = CGSize(width: bounds.width - 32, height: bounds.height - 16)
 
-            imageLoadTask = Task {
+            imageLoadTask = Task { [weak self] in
+                guard let self else { return }
                 let image = await imageService.loadImage(from: url, targetSize: targetSize)
-
                 if self.currentNewsId == news.id {
-                    UIView.transition(with: newsImageView,
-                                      duration: 0.25,
-                                      options: .transitionCrossDissolve) {
+                    UIView.transition(with: self.newsImageView, duration: 0.25, options: .transitionCrossDissolve) {
                         self.newsImageView.image = image
                     }
                 }

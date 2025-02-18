@@ -32,7 +32,7 @@ final class NewsListViewController: UIViewController {
         return activityIndicator
     }()
 
-    // MARK: - life cycles
+    // MARK: - Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,15 +99,12 @@ extension NewsListViewController {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                               heightDimension: .absolute(Heights.Height600x300))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
                                                heightDimension: .absolute(Heights.Height600x300))
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-
         let section = NSCollectionLayoutSection(group: group)
         return UICollectionViewCompositionalLayout(section: section)
     }
-
 }
 
 // MARK: - Binding
@@ -115,38 +112,29 @@ extension NewsListViewController {
 extension NewsListViewController {
 
     private func bindViewModel() {
-        viewModel.$newsItems
+        viewModel.$state
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] newItems in
+            .sink { [weak self] state in
                 guard let self else { return }
-
-                let oldCount = self.collectionView.numberOfItems(inSection: 0)
-                let newCount = newItems.count
-
-                self.collectionView.performBatchUpdates {
-                    let indexPaths = (oldCount..<newCount).map {
-                        IndexPath(item: $0, section: 0)
-                    }
-                    self.collectionView.insertItems(at: indexPaths)
-                } completion: { _ in
+                switch state {
+                case .idle:
                     self.stopLoading()
-                }
-            }
-            .store(in: &cancellables)
-
-        viewModel.$isLoading
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] isLoading in
-                guard let self else { return }
-
-                if self.refreshControl.isRefreshing {
-                    return
-                }
-
-                if isLoading {
+                case .loading:
                     self.startLoading()
-                } else {
+                case .loaded(let data):
+                    let newCount = data.newsItems.count
+                    let oldCount = self.collectionView.numberOfItems(inSection: 0)
+                    self.collectionView.performBatchUpdates({
+                        let indexPaths = (oldCount..<newCount).map { IndexPath(item: $0, section: 0) }
+                        self.collectionView.insertItems(at: indexPaths)
+                    }, completion: { _ in
+                        self.stopLoading()
+                    })
+                case .error(let error):
                     self.stopLoading()
+                    Logger.shared.log(.error,
+                                      message: "Error loading news",
+                                      metadata: ["❌": error.localizedDescription])
                 }
             }
             .store(in: &cancellables)
@@ -160,17 +148,9 @@ extension NewsListViewController: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        guard indexPath.row < viewModel.newsItems.count else {
-            return
-        }
+        guard indexPath.row < viewModel.newsItems.count else { return }
         let news = viewModel.newsItems[indexPath.row]
         router?.showNewsDetail(with: news)
-    }
-
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let height = scrollView.frame.size.height
     }
 }
 
@@ -189,11 +169,7 @@ extension NewsListViewController: UICollectionViewDataSource {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         let cell: NewsCell = collectionView.dequeueReusableCell(indexPath: indexPath)
-
-        guard indexPath.row < viewModel.newsItems.count else {
-            return cell
-        }
-
+        guard indexPath.row < viewModel.newsItems.count else { return cell }
         let news = viewModel.newsItems[indexPath.row]
         cell.configure(with: news)
         return cell
@@ -203,9 +179,10 @@ extension NewsListViewController: UICollectionViewDataSource {
 extension NewsListViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(
         _ collectionView: UICollectionView,
-        prefetchItemsAt indexPaths: [IndexPath]) {
-            if indexPaths.contains(where: { $0.row >= viewModel.newsItems.count - 1 }) && !viewModel.isLoading {
-                viewModel.loadNews()
-            }
+        prefetchItemsAt indexPaths: [IndexPath]
+    ) {
+        if indexPaths.contains(where: { $0.row >= viewModel.newsItems.count - 1 }) {
+            viewModel.loadNews()
         }
+    }
 }

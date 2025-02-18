@@ -7,17 +7,9 @@
 
 import UIKit
 
-enum NewsState {
+enum State<T> {
     case idle
     case loading
-    case loaded(newsItems: [News], totalCount: Int, currentPage: Int)
-    case imageLoaded([UIImage])
+    case loaded(T)
     case error(Error)
 }
-
-//enum ImageLoadState {
-//    case idle
-//    case loading
-//    case loaded([UIImage])
-//    case error(Error)
-//}
