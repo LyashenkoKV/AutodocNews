@@ -13,8 +13,14 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
     // MARK: - Private Properties
 
     private let imageService: ImageServiceProtocol
-    private var currentNewsId: Int?
+    private var currentNews: News?
     private var imageLoadTask: Task<Void, Never>?
+
+    private lazy var shimmerView: ShimmerView = {
+        let view = ShimmerView()
+        view.isHidden = true
+        return view
+    }()
 
     private lazy var containerView: UIView = {
         let view = UIView()
@@ -80,10 +86,12 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        newsImageView.image = nil
-        currentNewsId = nil
         imageLoadTask?.cancel()
         imageLoadTask = nil
+        newsImageView.image = nil
+        titleLabel.text = nil
+        currentNews = nil
+        shimmerView.stopShimmer()
     }
 
     // MARK: - Setup UI
@@ -91,11 +99,12 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
     private func setupViews() {
         contentView.setupView(containerView)
 
-        [newsImageView, gradientView, titleLabel].forEach {
+        [newsImageView, shimmerView, gradientView, titleLabel].forEach {
             containerView.setupView($0)
         }
 
         newsImageView.constraintEdges(to: containerView)
+        shimmerView.constraintEdges(to: newsImageView)
 
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
@@ -150,21 +159,39 @@ final class NewsCell: UICollectionViewCell, ReuseIdentifying {
 extension NewsCell {
 
     func configure(with news: News) {
-        currentNewsId = news.id
-        titleLabel.text = news.title
-
         imageLoadTask?.cancel()
+        imageLoadTask = nil
 
-        if let imageUrlString = news.titleImageUrl, let url = URL(string: imageUrlString) {
-            let targetSize = CGSize(width: bounds.width - 32, height: bounds.height - 16)
+        newsImageView.image = nil
+        titleLabel.text = news.title
+        currentNews = news
 
-            imageLoadTask = Task { [weak self] in
-                guard let self else { return }
-                let image = await imageService.loadImage(from: url, targetSize: targetSize)
-                if self.currentNewsId == news.id {
-                    UIView.transition(with: self.newsImageView, duration: 0.25, options: .transitionCrossDissolve) {
-                        self.newsImageView.image = image
-                    }
+        shimmerView.isHidden = false
+        shimmerView.startShimmer()
+
+        guard let imageUrlString = news.titleImageUrl, let url = URL(string: imageUrlString) else {
+            shimmerView.isHidden = true
+            shimmerView.stopShimmer()
+            return
+        }
+
+        let targetSize = CGSize(width: bounds.width - 32, height: bounds.height - 16)
+
+        imageLoadTask = Task { [weak self] in
+            guard let self else { return }
+            if Task.isCancelled { return }
+
+            let image = await imageService.loadImage(from: url, targetSize: targetSize)
+
+            await MainActor.run {
+                if Task.isCancelled { return }
+                guard self.currentNews?.id == news.id else { return }
+
+                self.shimmerView.isHidden = true
+                self.shimmerView.stopShimmer()
+
+                UIView.transition(with: self.newsImageView, duration: 0.25, options: .transitionCrossDissolve) {
+                    self.newsImageView.image = image
                 }
             }
         }

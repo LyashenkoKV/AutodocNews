@@ -16,7 +16,14 @@ final class ImageService: ImageServiceProtocol {
 
     // MARK: - Private Properties
 
-    private let cache = NSCache<NSString, UIImage>()
+    private let cache: NSCache<NSString, UIImage> = {
+        let cache = NSCache<NSString, UIImage>()
+        cache.countLimit = 200
+        cache.totalCostLimit = 50 * 1024 * 1024
+        return cache
+    }()
+
+    private var failedURLs = Set<String>()
     private let networkService: NetworkServiceProtocol
     private let imageDownsampleProcessor: ImageDownsampleProcessorProtocol
 
@@ -40,35 +47,40 @@ final class ImageService: ImageServiceProtocol {
 
         let scale = await MainActor.run { UIScreen.main.scale }
 
-        var attempts = 3
+        return await withTaskGroup(of: UIImage?.self) { group in
+            group.addTask {
+                do {
+                    if Task.isCancelled { return nil }
 
-        while attempts > 0 {
-            do {
-                let (data, response) = try await networkService.fetchData(from: url)
+                    let (data, response) = try await self.networkService.fetchData(from: url)
 
-                guard let mimeType = (response as? HTTPURLResponse)?.mimeType,
-                      mimeType.hasPrefix("image") else {
-                    Logger.shared.log(.debug, message: "Invalid MIME type:",
-                                      metadata: ["⚠️": String(describing: (response as? HTTPURLResponse)?.mimeType)])
+                    if Task.isCancelled { return nil }
+
+                    guard let mimeType = (response as? HTTPURLResponse)?.mimeType, mimeType.hasPrefix("image") else {
+                        Logger.shared.log(.debug, message: "Invalid MIME type: \(String(describing: (response as? HTTPURLResponse)?.mimeType))")
+                        return nil
+                    }
+
+                    let image = try self.imageDownsampleProcessor.downsample(data: data, to: targetSize, scale: scale)
+
+                    if Task.isCancelled { return nil }
+
+                    self.cache.setObject(image, forKey: cacheKey)
+                    return image
+                } catch is CancellationError {
+                    Logger.shared.log(.debug, message: "Task cancelled for \(url)")
                     return nil
-                }
-
-                let image = try imageDownsampleProcessor.downsample(data: data, to: targetSize, scale: scale)
-
-                cache.setObject(image, forKey: cacheKey)
-                return image
-            } catch {
-                Logger.shared.log(.error, message: "Image load failed, attempts left: \(attempts - 1)",
-                                  metadata: ["❌": error.localizedDescription])
-                attempts -= 1
-
-                if attempts == 0 {
+                } catch {
+                    Logger.shared.log(.error, message: "Image load failed: \(error.localizedDescription)")
                     return nil
                 }
             }
-            try? await Task.sleep(nanoseconds: 500_000_000)
-        }
 
-        return nil
+            for await result in group {
+                return result
+            }
+
+            return nil
+        }
     }
 }
